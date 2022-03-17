@@ -1,0 +1,51 @@
+---
+stages:
+  - pre-commit
+  - test-suite
+  - pop-release
+
+include:
+  - project: saltstack/pop/cicd/ci-templates
+    file: /lint/pre-commit-run-all.yml
+  - project: saltstack/pop/cicd/ci-templates
+    file: /release/pop_release.yml
+
+variables:
+  # TODO If your upstream gitlab url is "gitlab.com/my/upstream/path"
+  # Then your CICD_UPSTREAM_PATH would be my/upstream/path"
+  # Set this variable for the bot to release this project on Pypi on tag
+  CICD_UPSTREAM_PATH: ""
+
+pre-commit-run-all:
+  image: registry.gitlab.com/saltstack/pop/cicd/containers/alpinelint:py39
+
+.test-suite:
+  stage: test-suite
+  needs:
+    - pre-commit-run-all
+  script:
+    - python3 -m pip install nox
+    - nox -e tests-3 -- -vv
+  artifacts:
+    when: always
+    paths:
+      - artifacts
+    reports:
+      junit: artifacts/junit-report.xml
+    expire_in: 30 days
+
+tests-3.7:
+  extends: .test-suite
+  image: python:3.7
+
+tests-3.8:
+  extends: .test-suite
+  image: python:3.8
+
+tests-3.9:
+  extends: .test-suite
+  image: python:3.9
+
+tests-3.10:
+  extends: .test-suite
+  image: python:3.10.0

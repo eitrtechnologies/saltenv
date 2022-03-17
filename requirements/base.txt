@@ -1,0 +1,3 @@
+pop>=17.0
+idem-aiohttp
+bs4
