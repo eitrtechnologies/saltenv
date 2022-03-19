@@ -8,10 +8,6 @@ CONFIG = {
         "default": None,
         "help": "Load extra options from a configuration file onto hub.OPT.saltenv",
     },
-    "install": {
-        "default": "",
-        "help": "The version of Salt to act on.",
-    },
     "repo_url": {
         "default": "https://repo.saltproject.io/salt/singlebin",
         "help": "Salt single binary repository location. Version directories are expected here.",
@@ -25,10 +21,14 @@ CONFIG = {
 # The selected subcommand for your cli tool will show up under hub.SUBPARSER
 # The value for a subcommand is a dictionary that will be passed as kwargs to argparse.ArgumentParser.add_subparsers
 SUBCOMMANDS = {
+    "init": {},
     "install": {},
     "list": {},
     "list-remote": {},
+    "pin": {},
+    "uninstall": {},
     "use": {},
+    "version": {},
 }
 
 # Include keys from the CONFIG dictionary that you want to expose on the cli
@@ -39,10 +39,11 @@ CLI_CONFIG = {
     # This option will be available under all subcommands and the root command
     "repo_url": {"options": ["-r", "--repo-url"], "subcommands": ["_global_"]},
     "saltenv_dir": {"options": ["-d", "--saltenv-dir"], "subcommands": ["_global_"]},
+    "force": {"options": ["--force"], "subcommands": ["init"]},
     "salt_version": {
         "display_priority": 0,
         "positional": True,
-        "subcommands": ["install", "use"],
+        "subcommands": ["install", "use", "uninstall"],
         "help": "The version of Salt to act on.",
     },
 }

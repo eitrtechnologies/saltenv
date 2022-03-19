@@ -1,170 +1,184 @@
-import mimetypes
-import os
-import re
-import sys
-import tarfile
-import zipfile
 from pathlib import Path
-from types import SimpleNamespace
+from textwrap import dedent
 
 import aiofiles
-from bs4 import BeautifulSoup
 
 __func_alias__ = {"list_": "list"}
-LOCAL_VERSIONS = []
-REMOTE_VERSIONS = {}
-
-
-async def local_version_list(hub, **kwargs):
-    """
-    This is the entrypoint for the async code in your project
-    """
-    ret = {}
-    versions_dir = Path(hub.OPT.saltenv.saltenv_dir) / "versions"
-    if versions_dir.exists():
-        ret = versions_dir.glob("salt-*")
-        ret = {ver.stem.replace("salt-", ""): ver for ver in ret}
-    return ret
-
-
-async def remote_version_list(hub, **kwargs):
-    """
-    This is the entrypoint for the async code in your project
-    """
-    ret = {}
-    ctx = SimpleNamespace(acct={})
-    repo_list = await hub.exec.request.raw.get(
-        ctx,
-        url=hub.OPT.saltenv.repo_url,
-    )
-    if repo_list.get("ret"):
-        soup = BeautifulSoup(repo_list["ret"], "html.parser")
-        ret = {
-            re.sub(r"-\d+$", "", node["href"][:-1]): node["href"][:-1]
-            for node in soup.find_all("a")
-            if node.get("href") and node["href"].endswith("/") and node["href"] != "../"
-        }
-    return ret
-
-
-async def download_version(hub, version, **kwargs):
-    """
-    This is the entrypoint for the async code in your project
-    """
-    ret = False
-    ctx = SimpleNamespace(acct={})
-    if not hub.saltenv.cli.REMOTE_VERSIONS:
-        hub.saltenv.cli.REMOTE_VERSIONS = await hub.saltenv.cli.remote_version_list()
-
-    if version in hub.saltenv.cli.REMOTE_VERSIONS:
-        file_list = await hub.exec.request.raw.get(
-            ctx,
-            url=f"{hub.OPT.saltenv.repo_url}/{hub.saltenv.cli.REMOTE_VERSIONS[version]}",
-        )
-        soup = BeautifulSoup(file_list["ret"], "html.parser")
-        links = [
-            node["href"]
-            for node in soup.find_all("a")
-            if node.get("href")
-            and not node["href"].endswith("/")
-            and node["href"] != "../"
-        ]
-
-        arch = os.uname().machine
-        if arch == "x86_64":
-            arch = "amd64"
-
-        pkg_name = ""
-        # TODO: verify download with SHA/GPG
-        for link in links:
-            if arch in link and sys.platform in link:
-                pkg_name = link
-
-        if pkg_name:
-            outfile = Path(hub.OPT.saltenv.saltenv_dir) / "downloads" / pkg_name
-            outfile.parent.mkdir(parents=True, exist_ok=True)
-            versions_dir = Path(hub.OPT.saltenv.saltenv_dir) / "versions"
-            versions_dir.mkdir(parents=True, exist_ok=True)
-            salt_bin_in = versions_dir / "salt"
-            salt_bin_out = versions_dir / f"salt-{version}"
-
-            download_url = "/".join(
-                [
-                    hub.OPT.saltenv.repo_url,
-                    hub.saltenv.cli.REMOTE_VERSIONS[version],
-                    pkg_name,
-                ]
-            )
-
-            pkg = {}
-            if not outfile.exists():
-                pkg = await hub.exec.request.raw.get(
-                    ctx,
-                    url=download_url,
-                )
-
-            if (outfile.exists() and not salt_bin_out.exists()) or (
-                pkg and pkg["status"] == 200
-            ):
-                async with aiofiles.open(outfile, "wb") as ofile:
-                    await ofile.write(pkg["ret"])
-                filemimetype = mimetypes.guess_type(outfile)
-
-                if (
-                    filemimetype and filemimetype[0] == "application/zip"
-                ) or outfile.suffix == ".zip":
-                    print("Processing zip file...")
-                    if zipfile.is_zipfile(outfile):
-                        zip_source = zipfile.ZipFile(outfile)
-                        zip_source.extractall(versions_dir)
-                        if salt_bin_in.exists():
-                            salt_bin_in.rename(salt_bin_out)
-                elif filemimetype == ("application/x-tar", "gzip") or str(
-                    outfile
-                ).endswith(".tar.gz"):
-                    print("Processing tarball...")
-                    if tarfile.is_tarfile(outfile):
-                        with tarfile.open(outfile) as tar_source:
-                            tar_source.extractall(versions_dir)
-                        if salt_bin_in.exists():
-                            salt_bin_in.rename(salt_bin_out)
-                else:
-                    print(
-                        f"ERROR: Unknown file type for download {outfile}: {filemimetype}"
-                    )
-                    return False
-                ret = True
-    return ret
 
 
 async def list_(hub, **kwargs):
     """
     This is the entrypoint for the async code in your project
     """
-    versions = await hub.saltenv.cli.local_version_list()
-    print("Local versions available:")
-    print("\n".join(sorted(versions.keys())))
+    await hub.saltenv.ops.fill_local_version_list()
+    current_version = await hub.saltenv.ops.get_current_version()
+    version_list = []
+    for ver in sorted(hub.saltenv.ops.LOCAL_VERSIONS.keys(), reverse=True):
+        prefix = "  "
+        suffix = ""
+        if ver == current_version[0]:
+            prefix = "* "
+            suffix = f" (set by {current_version[1]})"
+        version_list.append(prefix + ver + suffix)
+    print("\n".join(version_list))
 
 
 async def list_remote(hub, **kwargs):
     """
     This is the entrypoint for the async code in your project
     """
-    versions = await hub.saltenv.cli.remote_version_list()
-    print("Remote versions available:")
-    print("\n".join(sorted(versions.keys())))
+    await hub.saltenv.ops.fill_remote_version_list()
+    print("\n".join(sorted(hub.saltenv.ops.REMOTE_VERSIONS.keys(), reverse=True)))
 
 
 async def install(hub, **kwargs):
     """
     This is the entrypoint for the async code in your project
     """
-    hub.saltenv.cli.REMOTE_VERSIONS = await hub.saltenv.cli.remote_version_list()
-    hub.saltenv.cli.LOCAL_VERSIONS = await hub.saltenv.cli.local_version_list()
+    await hub.saltenv.ops.fill_remote_version_list()
+    await hub.saltenv.ops.fill_local_version_list()
 
-    if hub.OPT.saltenv.salt_version in hub.saltenv.cli.LOCAL_VERSIONS:
+    if hub.OPT.saltenv.salt_version in hub.saltenv.ops.LOCAL_VERSIONS:
         print(f"{hub.OPT.saltenv.salt_version} is already installed.")
-    elif hub.OPT.saltenv.salt_version in hub.saltenv.cli.REMOTE_VERSIONS:
-        await hub.saltenv.cli.download_version(hub.OPT.saltenv.salt_version)
+    elif hub.OPT.saltenv.salt_version in hub.saltenv.ops.REMOTE_VERSIONS:
+        await hub.saltenv.ops.download_version(hub.OPT.saltenv.salt_version)
     else:
         print(f"ERROR: {hub.OPT.saltenv.salt_version} is not available as a binary.")
+
+
+async def uninstall(hub, **kwargs):
+    """
+    This is the entrypoint for the async code in your project
+    """
+    await hub.saltenv.ops.fill_remote_version_list()
+    await hub.saltenv.ops.fill_local_version_list()
+
+    if hub.OPT.saltenv.salt_version in hub.saltenv.ops.LOCAL_VERSIONS:
+        await hub.saltenv.ops.remove_version(hub.OPT.saltenv.salt_version)
+    else:
+        print(f"{hub.OPT.saltenv.salt_version} is already uninstalled.")
+
+
+async def use(hub, **kwargs):
+    """
+    This is the entrypoint for the async code in your project
+    """
+    await hub.saltenv.ops.use_version(hub.OPT.saltenv.salt_version)
+
+
+async def pin(hub, **kwargs):
+    """
+    This is the entrypoint for the async code in your project
+    """
+    await hub.saltenv.ops.pin_current_version()
+
+
+async def version(hub, **kwargs):
+    """
+    This is the entrypoint for the async code in your project
+    """
+    current_version = await hub.saltenv.ops.get_current_version()
+    if current_version[0]:
+        print(f"{current_version[0]} (set by {current_version[1]})")
+    else:
+        print("ERROR: No version of Salt is set!")
+
+
+async def init(hub, **kwargs):
+    """
+    This is the entrypoint for the async code in your project
+    """
+    salt_bin = Path(hub.OPT.saltenv.saltenv_dir) / "bin" / "salt"
+    salt_bin.parent.mkdir(parents=True, exist_ok=True)
+    minion_config = Path(hub.OPT.saltenv.saltenv_dir) / "etc" / "salt" / "minion"
+    minion_config.parent.mkdir(parents=True, exist_ok=True)
+
+    wrapper = dedent(
+        f"""
+        #!/usr/bin/env python3
+
+        import os
+        import subprocess
+        import sys
+        from pathlib import Path
+
+        if __name__ == "__main__":
+            saltenv_dir = Path("{hub.OPT.saltenv.saltenv_dir}")
+            override_version_file = Path(os.getcwd()) / ".salt-version"
+            main_version_file = saltenv_dir / "version"
+
+            current_version = ""
+
+            if override_version_file.exists():
+                with open(override_version_file, "r") as cfile:
+                    current_version = cfile.read()
+                    current_version = current_version.replace("\\n", "").strip()
+
+            if not current_version and main_version_file.exists():
+                with open(main_version_file, "r") as vfile:
+                    current_version = vfile.read()
+                    current_version = current_version.replace("\\n", "").strip()
+
+            current_bin = saltenv_dir / "versions" / ("salt-" + current_version)
+
+            if current_version and current_bin.exists():
+                del sys.argv[0]
+                opt = ""
+                if sys.argv and sys.argv[0] in [
+                    "master",
+                    "minion",
+                    "call",
+                    "ssh",
+                    "syndic",
+                    "cloud",
+                    "api",
+                    "pip",
+                ]:
+                    opt = sys.argv.pop(0)
+                cmd = [
+                    str(current_bin),
+                    opt,
+                    "-c",
+                    str(saltenv_dir / "etc" / "salt"),
+                ] + sys.argv
+                subprocess.call(cmd)
+            elif current_version:
+                print("ERROR: Version " + current_version + " of Salt is not installed!")
+            else:
+                print("ERROR: No version of Salt specified!")
+        """
+    )
+    wrapper = wrapper[1:]
+
+    minion = dedent(
+        f"""
+        root_dir: {hub.OPT.saltenv.saltenv_dir}
+        file_client: local
+        master_type: disable
+        pub_ret: false
+        mine_enabled: false
+
+        file_roots:
+          __env__:
+            - ./salt
+
+        pillar_roots:
+          __env__:
+            - ./pillar
+        """
+    )
+
+    async with aiofiles.open(salt_bin, "w") as ofile:
+        await ofile.write(wrapper)
+    salt_bin.chmod(0o755)
+
+    if hub.OPT.saltenv.force:
+        async with aiofiles.open(minion_config, "w") as cfile:
+            await cfile.write(minion)
+
+    print(
+        "Add the saltenv bin directory to your PATH:\n\n"
+        f"    echo 'export PATH=\"$PATH:{salt_bin.parent}\"' >> ~/.bashrc\n"
+        "OR:\n"
+        f"    echo 'export PATH=\"$PATH:{salt_bin.parent}\"' >> ~/.zshrc\n"
+    )

@@ -25,9 +25,22 @@ async def run(hub, **kwargs):
     """
     This is the entrypoint for the async code in your project
     """
-    if hub.SUBPARSER == "list":
+    if hub.SUBPARSER == "init":
+        return await hub.saltenv.cli.init()
+    elif hub.SUBPARSER == "install":
+        return await hub.saltenv.cli.install()
+    elif hub.SUBPARSER == "list":
         return await hub.saltenv.cli.list()
     elif hub.SUBPARSER == "list-remote":
         return await hub.saltenv.cli.list_remote()
-    elif hub.SUBPARSER == "install":
-        return await hub.saltenv.cli.install()
+    elif hub.SUBPARSER == "pin":
+        return await hub.saltenv.cli.pin()
+    elif hub.SUBPARSER == "uninstall":
+        return await hub.saltenv.cli.uninstall()
+    elif hub.SUBPARSER == "use":
+        return await hub.saltenv.cli.use()
+    elif hub.SUBPARSER == "version":
+        return await hub.saltenv.cli.version()
+    else:
+        print(hub.args.parser.help())
+        return 2
