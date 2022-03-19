@@ -195,9 +195,6 @@ async def remove_version(hub, version, **kwargs):
     salt_bin = hub.saltenv.ops.LOCAL_VERSIONS.get(version)
     if salt_bin:
         salt_bin.unlink()
-        current_version = await hub.saltenv.ops.get_current_version()
-        if version == current_version[0]:
-            version_file.unlink()
 
     return True
 

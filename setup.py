@@ -7,7 +7,7 @@ from setuptools import Command
 from setuptools import setup
 
 NAME = "saltenv"
-DESC = ""
+DESC = "Salt binary installation and management tool"
 
 # Version info -- read without importing
 _locals = {}
@@ -63,9 +63,9 @@ def discover_packages():
 
 setup(
     name="saltenv",
-    author="nicholasmhughes",
-    author_email="nicholasmhughes@gmail.com",
-    url="",
+    author="EITR Technologies, LLC",
+    author_email="devops@eitr.tech",
+    url="https://github.com/eitrtechnologies/saltenv",
     version=VERSION,
     install_requires=REQUIREMENTS,
     extras_require=REQUIREMENTS_EXTRA,

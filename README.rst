@@ -10,24 +10,18 @@ saltenv
    :alt: Made with Python
    :target: https://www.python.org/
 
-.. todo:: (Set ``todo_include_todos = False`` in ``docs/conf.py`` to hide this)
 
-   What is the purpose of this project? Give a brief sentence or two as your pitch.
+saltenv is a Salt binary installation and management tool, inspired by `tfenv <https://github.com/tfutils/tfenv>`__
 
 About
 =====
 
-.. todo:: (Set ``todo_include_todos = False`` in ``docs/conf.py`` to hide this)
+saltenv allows users to easily install multiple salt binaries built with tiamat.
+This is useful for standalone machine (desktop/laptop) configuration where the
+full Salt installation isn't warranted or necessary.
 
-   A more detailed description about the project.
-
-   All TODO items on this page are part of the pop template, and should be
-   reviewed and replaced with actual content.
-
-   This page is the ``README.rst`` page that appears on a repo site, such as
-   GitHub/GitLab, but also is what appears on the PyPI landing page of a published
-   python project. Sphinx docs, by default, include the contents of this file
-   in the published docs.
+saltenv is built as a POP application, which allows it to leverage other POP
+plugins in the ecosystem or plug into other applications as necessary.
 
 What is POP?
 ------------
@@ -49,7 +43,7 @@ Getting Started
 Prerequisites
 -------------
 
-* Python 3.6+
+* Python 3.7+
 * git *(if installing from source, or contributing to the project)*
 
 Installation
@@ -67,13 +61,9 @@ installing from PyPI or from source.
 Install from PyPI
 +++++++++++++++++
 
-.. todo:: (Set ``todo_include_todos = False`` in ``docs/conf.py`` to hide this)
+.. code-block:: bash
 
-   If package is available via PyPI, include the directions.
-
-   .. code-block:: bash
-
-      pip install saltenv
+   pip install saltenv
 
 Install from source
 +++++++++++++++++++
@@ -81,31 +71,111 @@ Install from source
 .. code-block:: bash
 
    # clone repo
-   git clone git@<your-project-path>/saltenv.git
+   git clone git@github.com/eitrtechnologies/saltenv.git
    cd saltenv
 
    # Setup venv
-   python3 -m venv .venv
+   python3 -m venv .venv --prompt saltenv
    source .venv/bin/activate
    pip install -e .
 
 Usage
 =====
 
-.. todo:: (Set ``todo_include_todos = False`` in ``docs/conf.py`` to hide this)
+.. code-block:: bash
 
-   Describe some basic example use case for this plugin.
+   usage: run.py [-h] [--config CONFIG] [--config-template] [--log-datefmt LOG_DATEFMT] [--log-file LOG_FILE] [--log-fmt-console LOG_FMT_CONSOLE]
+              [--log-fmt-logfile LOG_FMT_LOGFILE] [--log-handler-options [LOG_HANDLER_OPTIONS ...]] [--log-level LOG_LEVEL] [--log-plugin LOG_PLUGIN] [--repo-url REPO_URL]
+              [--saltenv-dir SALTENV_DIR] [--version]
+              {init,install,list,list-remote,pin,uninstall,use,version} ...
+
+   positional arguments:
+     {init,install,list,list-remote,pin,uninstall,use,version}
+
+   options:
+     -h, --help            show this help message and exit
+     --config CONFIG, -c CONFIG
+                           Load extra options from a configuration file onto hub.OPT.saltenv
+     --config-template     Output a config template for this command
+     --repo-url REPO_URL, -r REPO_URL
+                           Salt single binary repository location. Version directories are expected here.
+     --saltenv-dir SALTENV_DIR, -d SALTENV_DIR
+                           Working directory for saltenv downloads
+     --version             Display version information
+
+   Logging Options:
+     --log-datefmt LOG_DATEFMT
+                           The date format to display in the logs
+     --log-file LOG_FILE   The location of the log file
+     --log-fmt-console LOG_FMT_CONSOLE
+                           The log formatting used in the console
+     --log-fmt-logfile LOG_FMT_LOGFILE
+                           The format to be given to log file messages
+     --log-handler-options [LOG_HANDLER_OPTIONS ...]
+                           kwargs that should be passed to the logging handler used by the log_plugin
+     --log-level LOG_LEVEL
+                           Set the log level, either quiet, info, warning, debug or error
+     --log-plugin LOG_PLUGIN
+                           The logging plugin to use
+
 
 Examples
 --------
 
-.. todo:: (Set ``todo_include_todos = False`` in ``docs/conf.py`` to hide this)
-
-   Provide some example CLI-based commands for users.
+Basic salt binary setup with version 3004:
 
 .. code-block:: bash
 
    # Example CLI commands
+
+
+   # List remote versions
+
+   $ saltenv list-remote
+   3004rc1
+   3004
+   3003.3
+   3003
+
+
+   # Install version 3004
+
+   $ saltenv install 3004
+   Processing tarball...
+
+
+   # Use version 3004
+
+   $ saltenv use 3004
+
+
+   # List local versions
+
+   $ saltenv list
+   * 3004 set by /home/nmhughes/.saltenv/version
+     3003.3
+     3003
+
+
+   # Initialize the saltenv environment, which will point to the salt binaries
+
+   $ saltenv init
+   Add the saltenv bin directory to your PATH:
+
+       echo 'export PATH="$PATH:/home/nmhughes/.saltenv/bin"' >> ~/.bashrc
+   OR:
+       echo 'export PATH="$PATH:/home/nmhughes/.saltenv/bin"' >> ~/.zshrc
+
+   $ echo 'export PATH="$PATH:/home/nmhughes/.saltenv/bin"' >> ~/.zshrc
+   $ source ~/.zshrc
+
+
+   # Kick the tires!
+
+   $ salt call test.version
+   local:
+       3004
+
 
 Common Issues
 =============
@@ -120,12 +190,8 @@ Common Issues
 Roadmap
 =======
 
-.. todo:: (Set ``todo_include_todos = False`` in ``docs/conf.py`` to hide this)
-
-   Update **open issues** link below with link to GitHub/GitLab/etc. issues page
-
-Reference the `open issues <https://issues.example.com>`__ for a list of
-proposed features (and known issues).
+Reference the `open issues <https://github.com/eitrtechnologies/saltenv/issues>`__
+for a list of proposed features (and known issues).
 
 Acknowledgements
 ================
