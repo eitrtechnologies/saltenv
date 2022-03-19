@@ -45,9 +45,7 @@ class Clean(Command):
 
     def run(self):
         for subdir in (NAME, "tests"):
-            for root, dirs, files in os.walk(
-                os.path.join(os.path.dirname(__file__), subdir)
-            ):
+            for root, dirs, files in os.walk(os.path.join(os.path.dirname(__file__), subdir)):
                 for dir_ in dirs:
                     if dir_ == "__pycache__":
                         shutil.rmtree(os.path.join(root, dir_))

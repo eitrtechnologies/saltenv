@@ -70,9 +70,7 @@ def _get_session_python_version_info(session):
             silent=True,
             log=False,
         )
-        version_info = tuple(
-            int(part) for part in session_py_version.split(".") if part.isdigit()
-        )
+        version_info = tuple(int(part) for part in session_py_version.split(".") if part.isdigit())
         session._runner._real_python_version_info = version_info
     return version_info
 
@@ -93,9 +91,7 @@ def tests(session):
         session.install("-e", ".", silent=PIP_INSTALL_SILENT)
 
         # Install requirements
-        requirements_file = (
-            REPO_ROOT / "requirements" / _get_pydir(session) / "tests.txt"
-        )
+        requirements_file = REPO_ROOT / "requirements" / _get_pydir(session) / "tests.txt"
         install_command = [
             "--progress-bar=off",
             "-r",
@@ -111,9 +107,7 @@ def tests(session):
                 EXTRA_REQUIREMENTS_INSTALL,
             )
             install_command = ["--progress-bar=off"]
-            install_command += [
-                req.strip() for req in EXTRA_REQUIREMENTS_INSTALL.split()
-            ]
+            install_command += [req.strip() for req in EXTRA_REQUIREMENTS_INSTALL.split()]
             session.install(*install_command, silent=PIP_INSTALL_SILENT)
 
     session.run("coverage", "erase")
@@ -179,9 +173,7 @@ def tests(session):
         )
         # Move the coverage DB to artifacts/coverage in order for it to be archived by CI
         if COVERAGE_REPORT_DB.exists():
-            shutil.move(
-                str(COVERAGE_REPORT_DB), str(ARTIFACTS_DIR / COVERAGE_REPORT_DB.name)
-            )
+            shutil.move(str(COVERAGE_REPORT_DB), str(ARTIFACTS_DIR / COVERAGE_REPORT_DB.name))
 
 
 @nox.session(name="docs-html", python="3")

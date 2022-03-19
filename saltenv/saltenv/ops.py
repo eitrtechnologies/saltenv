@@ -78,9 +78,7 @@ async def download_version(hub, version, **kwargs):
         links = [
             node["href"]
             for node in soup.find_all("a")
-            if node.get("href")
-            and not node["href"].endswith("/")
-            and node["href"] != "../"
+            if node.get("href") and not node["href"].endswith("/") and node["href"] != "../"
         ]
 
         arch = os.uname().machine
@@ -118,9 +116,7 @@ async def download_version(hub, version, **kwargs):
                 async with aiofiles.open(outfile, "wb") as ofile:
                     await ofile.write(pkg["ret"])
 
-            if (outfile.exists() and not salt_bin_out.exists()) or (
-                pkg and pkg["status"] == 200
-            ):
+            if (outfile.exists() and not salt_bin_out.exists()) or (pkg and pkg["status"] == 200):
                 filemimetype = mimetypes.guess_type(outfile)
 
                 if (
@@ -135,9 +131,9 @@ async def download_version(hub, version, **kwargs):
                         ret = salt_bin_out.exists()
                     else:
                         print(f"ERROR: Unable to extract {outfile}")
-                elif filemimetype == ("application/x-tar", "gzip") or str(
-                    outfile
-                ).endswith(".tar.gz"):
+                elif filemimetype == ("application/x-tar", "gzip") or str(outfile).endswith(
+                    ".tar.gz"
+                ):
                     print("Processing tarball...")
                     if tarfile.is_tarfile(outfile):
                         with tarfile.open(outfile) as tar_source:
@@ -148,9 +144,7 @@ async def download_version(hub, version, **kwargs):
                     else:
                         print(f"ERROR: Unable to extract {outfile}")
                 else:
-                    print(
-                        f"ERROR: Unknown file type for download {outfile}: {filemimetype}"
-                    )
+                    print(f"ERROR: Unknown file type for download {outfile}: {filemimetype}")
     return ret
 
 
