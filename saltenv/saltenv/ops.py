@@ -117,7 +117,7 @@ async def download_version(hub, version, **kwargs):
                     await ofile.write(pkg["ret"])
 
             if (outfile.exists() and not salt_bin_out.exists()) or (pkg and pkg["status"] == 200):
-                filemimetype = mimetypes.guess_type(outfile)
+                filemimetype = mimetypes.guess_type(str(outfile))
 
                 if (
                     filemimetype and filemimetype[0] == "application/zip"

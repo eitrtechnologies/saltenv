@@ -124,6 +124,7 @@ async def init(hub, **kwargs):
             if current_version and current_bin.exists():
                 del sys.argv[0]
                 opt = ""
+                extra_args = []
                 if sys.argv and sys.argv[0] in [
                     "master",
                     "minion",
@@ -135,12 +136,19 @@ async def init(hub, **kwargs):
                     "pip",
                 ]:
                     opt = sys.argv.pop(0)
-                cmd = [
-                    str(current_bin),
-                    opt,
-                    "-c",
-                    str(saltenv_dir / "etc" / "salt"),
-                ] + sys.argv
+                    if opt != "pip":
+                        extra_args = [
+                            "-c",
+                            str(saltenv_dir / "etc" / "salt"),
+                        ]
+                cmd = (
+                    [
+                        str(current_bin),
+                        opt,
+                    ]
+                    + extra_args
+                    + sys.argv
+                )
                 subprocess.call(cmd)
             elif current_version:
                 print("ERROR: Version " + current_version + " of Salt is not installed!")
@@ -157,13 +165,15 @@ async def init(hub, **kwargs):
         master_type: disable
         pub_ret: false
         mine_enabled: false
+        enable_fqdns_grains: false
+        top_file_merging_strategy: same
 
         file_roots:
-          __env__:
+          base:
             - ./salt
 
         pillar_roots:
-          __env__:
+          base:
             - ./pillar
         """
     )
@@ -172,13 +182,13 @@ async def init(hub, **kwargs):
         await ofile.write(wrapper)
     salt_bin.chmod(0o755)
 
-    if hub.OPT.saltenv.force:
+    if not minion_config.exists() or hub.OPT.saltenv.force:
         async with aiofiles.open(minion_config, "w") as cfile:
             await cfile.write(minion)
 
     print(
         "Add the saltenv bin directory to your PATH:\n\n"
-        f"    echo 'export PATH=\"$PATH:{salt_bin.parent}\"' >> ~/.bashrc\n"
+        f"    echo 'export PATH=\"{salt_bin.parent}:$PATH\"' >> ~/.bashrc\n"
         "OR:\n"
-        f"    echo 'export PATH=\"$PATH:{salt_bin.parent}\"' >> ~/.zshrc\n"
+        f"    echo 'export PATH=\"{salt_bin.parent}:$PATH\"' >> ~/.zshrc\n"
     )
