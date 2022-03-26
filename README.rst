@@ -162,11 +162,11 @@ Basic salt binary setup with version 3004:
    $ saltenv init
    Add the saltenv bin directory to your PATH:
 
-       echo 'export PATH="$PATH:/home/nmhughes/.saltenv/bin"' >> ~/.bashrc
+       echo 'export PATH="$HOME/.saltenv/bin:$PATH"' >> ~/.bashrc
    OR:
-       echo 'export PATH="$PATH:/home/nmhughes/.saltenv/bin"' >> ~/.zshrc
+       echo 'export PATH="$HOME/.saltenv/bin:$PATH"' >> ~/.zshrc
 
-   $ echo 'export PATH="$PATH:/home/nmhughes/.saltenv/bin"' >> ~/.zshrc
+   $ echo 'export PATH="$HOME/.saltenv/bin:$PATH"' >> ~/.zshrc
    $ source ~/.zshrc
 
 
