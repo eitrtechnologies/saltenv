@@ -2,7 +2,7 @@ import mock
 from pathlib import Path
 
 
-async def test_valid_response(mock_hub, hub):
+async def test_remote_version_list_valid_response(mock_hub, hub):
     # Link the function to the mock_hub
     mock_hub.saltenv.ops.remote_version_list = hub.saltenv.ops.remote_version_list
 
@@ -52,11 +52,26 @@ async def test_remote_version_list_invalid_response1(mock_hub, hub):
     assert expected == actual
 
 
-# TODO ADD A INVALID RESPONSE THROWING AN EXCEPTION TEST
 async def test_remote_version_list_invalid_response2(mock_hub, hub):
     """
-    SCENARIO #2:
+    SCENARIO #2: A HttpStatus error occurred (i.e., 404)
     """
     # Link the function to the mock_hub
     mock_hub.saltenv.ops.remote_version_list = hub.saltenv.ops.remote_version_list
-    pass
+
+    # Set the return value of the mocked hub.exec.request.raw.get to be an invalid return object.
+    # Note: Only the some of the dictionary values are included in this mocked return object.
+    # This is because many values are not necessary from a testing perspective.
+    mock_hub.exec.request.raw.get.return_value = {
+        "result": False,
+        "ret": "An incorrect query parameter was specified",
+        "comment": "Not Found",
+        "ref": "exec.request.raw.get",
+        "status": 404,
+        "headers": {},
+    }
+
+    # Compare the actual and expected results
+    expected = {}
+    actual = await mock_hub.saltenv.ops.remote_version_list()
+    assert expected == actual
