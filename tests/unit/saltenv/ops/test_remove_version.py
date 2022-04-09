@@ -32,7 +32,7 @@ async def test_remove_version_exists(mock_hub, hub, tmp_path):
         "3001": Path(valid_path_3001),
         "3004": Path(valid_path_3004),
     }
-  
+
     # Set the expected LOCAL_VERSIONS value after remove_version is called.
     # This needs to be created before remove_version because otherwise
     # the Path object creation would fail due to the file having been deleted.
