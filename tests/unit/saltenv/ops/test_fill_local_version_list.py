@@ -1,5 +1,5 @@
 import mock
-from pathlib import Path, PosixPath
+from pathlib import Path
 
 
 async def test_fill_local_version_list(mock_hub, hub):

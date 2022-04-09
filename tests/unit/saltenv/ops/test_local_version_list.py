@@ -1,5 +1,5 @@
 import mock
-from pathlib import Path, PosixPath
+from pathlib import Path
 
 
 async def test_nonexistent_dir(mock_hub, hub):

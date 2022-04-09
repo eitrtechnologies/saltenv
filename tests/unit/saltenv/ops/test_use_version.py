@@ -1,5 +1,5 @@
 import mock
-from pathlib import Path, PosixPath
+from pathlib import Path
 import aiofiles
 
 

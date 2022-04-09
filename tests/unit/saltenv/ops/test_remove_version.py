@@ -1,18 +1,5 @@
 import mock
-from pathlib import Path, PosixPath
-
-"""
-async def remove_version(hub, version, **kwargs):
-    '''
-    This is the entrypoint for the async code in your project
-    '''
-    salt_bin = hub.saltenv.ops.LOCAL_VERSIONS.get(version)
-    if salt_bin:
-        salt_bin.unlink()
-
-    return True
-
-"""
+from pathlib import Path
 
 
 async def test_remove_version_exists(mock_hub, hub, tmp_path):
@@ -89,7 +76,7 @@ async def test_remove_version_does_not_exist(mock_hub, hub, tmp_path):
     assert expected_local_versions == mock_hub.saltenv.ops.LOCAL_VERSIONS
 
 
-async def test_remove_version_empty_(mock_hub, hub):
+async def test_remove_version_empty(mock_hub, hub):
     # Link the function to the mock_hub
     mock_hub.saltenv.ops.remove_version = hub.saltenv.ops.remove_version
 

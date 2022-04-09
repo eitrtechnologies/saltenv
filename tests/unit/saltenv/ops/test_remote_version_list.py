@@ -1,5 +1,5 @@
 import mock
-from pathlib import Path, PosixPath
+from pathlib import Path
 
 
 async def test_valid_response(mock_hub, hub):
