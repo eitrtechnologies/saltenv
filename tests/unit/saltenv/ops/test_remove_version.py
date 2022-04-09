@@ -2,7 +2,11 @@ import mock
 from pathlib import Path
 
 
-async def test_remove_version_exists(mock_hub, hub, tmp_path):
+async def test_remove_version1(mock_hub, hub, tmp_path):
+    """
+    SCENARIO #1:
+    - The version exists within LOCAL_VERSIONS
+    """
     # Link the function to the mock_hub
     mock_hub.saltenv.ops.remove_version = hub.saltenv.ops.remove_version
 
@@ -39,7 +43,11 @@ async def test_remove_version_exists(mock_hub, hub, tmp_path):
     assert expected_local_versions == mock_hub.saltenv.ops.LOCAL_VERSIONS
 
 
-async def test_remove_version_does_not_exist(mock_hub, hub, tmp_path):
+async def test_remove_version2(mock_hub, hub, tmp_path):
+    """
+    SCENARIO #2:
+    - The version does not exist within LOCAL_VERSIONS
+    """
     # Link the function to the mock_hub
     mock_hub.saltenv.ops.remove_version = hub.saltenv.ops.remove_version
 
@@ -76,7 +84,12 @@ async def test_remove_version_does_not_exist(mock_hub, hub, tmp_path):
     assert expected_local_versions == mock_hub.saltenv.ops.LOCAL_VERSIONS
 
 
-async def test_remove_version_empty(mock_hub, hub):
+async def test_remove_version3(mock_hub, hub):
+    """
+    SCENARIO #3:
+    - LOCAL_VERSIONS is empty
+    """
+
     # Link the function to the mock_hub
     mock_hub.saltenv.ops.remove_version = hub.saltenv.ops.remove_version
 

@@ -2,7 +2,11 @@ import mock
 from pathlib import Path
 
 
-async def test_remote_version_list_valid_response(mock_hub, hub):
+async def test_remote_version_list1(mock_hub, hub):
+    """
+    SCENARIO #1:
+    - There was a valid response recieved by the GET request
+    """
     # Link the function to the mock_hub
     mock_hub.saltenv.ops.remote_version_list = hub.saltenv.ops.remote_version_list
 
@@ -29,9 +33,10 @@ async def test_remote_version_list_valid_response(mock_hub, hub):
     assert expected == actual
 
 
-async def test_remote_version_list_invalid_response1(mock_hub, hub):
+async def test_remote_version_list2(mock_hub, hub):
     """
-    SCENARIO #1: There is no valid "ret" value given in the request response
+    SCENARIO #2:
+    - There was a invalid response recieved by the GET request (no "ret" value)
     """
     # Link the function to the mock_hub
     mock_hub.saltenv.ops.remote_version_list = hub.saltenv.ops.remote_version_list
@@ -52,9 +57,10 @@ async def test_remote_version_list_invalid_response1(mock_hub, hub):
     assert expected == actual
 
 
-async def test_remote_version_list_invalid_response2(mock_hub, hub):
+async def test_remote_version_list3(mock_hub, hub):
     """
-    SCENARIO #2: A HttpStatus error occurred (i.e., 404)
+    SCENARIO #2:
+    - There was a invalid response recieved by the GET request (Actual error such as 404 -- Bad Response)
     """
     # Link the function to the mock_hub
     mock_hub.saltenv.ops.remote_version_list = hub.saltenv.ops.remote_version_list
