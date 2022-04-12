@@ -1,65 +1,90 @@
-import mock
-from pathlib import Path
+from unittest.mock import patch, MagicMock
+from pathlib import Path, PosixPath, PurePosixPath
+import pathlib
 
 
 async def test_local_version_list1(mock_hub, hub):
     """
     SCENARIO #1:
-    - The saltenv_dir directory does not exist
+    - The versions_dir directory does not exist
     """
     # Link the function to the mock_hub
     mock_hub.saltenv.ops.local_version_list = hub.saltenv.ops.local_version_list
-    mock_hub.OPT.saltenv.saltenv_dir = "nonexistent_testing_dir"
-    actual = await mock_hub.saltenv.ops.local_version_list()
-    expected = {}
-    assert expected == actual
+
+    # Rather than mock pathlib.Path, we will just set the mock_hub.OPT.saltenv.saltenv_dir
+    # value because pathlib.Path is not easy to subclass for mocking purposes (issues occur
+    # with the _flavour attribute)
+    mock_hub.OPT.saltenv.saltenv_dir = "nonexistent_dir"
+
+    # Mock Path.exists() to return False
+    with patch("pathlib.PosixPath.exists", return_value=False) as mock_exists:
+        # Ensure that an empty dict is returned
+        actual = await mock_hub.saltenv.ops.local_version_list()
+        expected = {}
+        assert expected == actual
+
+        # Ensure every mocked function was called the appropriate number of times
+        mock_exists.assert_called_once()
 
 
 async def test_local_version_list2(mock_hub, hub, tmp_path):
     """
     SCENARIO #2:
-    - The saltenv_dir directory exists
+    - The versions_dir directory exists
+    - There are no local versions matching the glob pattern
     """
     # Link the function to the mock_hub
     mock_hub.saltenv.ops.local_version_list = hub.saltenv.ops.local_version_list
-    mock_hub.OPT.saltenv.saltenv_dir = tmp_path
 
-    # Create the mocked version dir to insert files in for testing
-    mocked_versions_dir = tmp_path / "versions"
-    mocked_versions_dir.mkdir()
+    # Rather than mock pathlib.Path, we will just set the mock_hub.OPT.saltenv.saltenv_dir
+    # value because pathlib.Path is not easy to subclass for mocking purposes (issues occur
+    # with the _flavour attribute)
+    mock_hub.OPT.saltenv.saltenv_dir = "existent_dir"
 
-    # Confirm that the return dictionary is empty if the directory does not contain any version files
-    expected = {}
-    actual = await mock_hub.saltenv.ops.local_version_list()
-    assert actual == expected
+    # Mock Path.exists() to return True
+    with patch("pathlib.PosixPath.exists", return_value=True) as mock_exists:
+        # Mock Path.glob return an empty list
+        glob_results = []
+        with patch("pathlib.PosixPath.glob", return_value=glob_results) as mock_glob:
+            # Ensure that an empty dict is returned
+            actual = await mock_hub.saltenv.ops.local_version_list()
+            expected = {}
+            assert expected == actual
 
-    # Confirm that the return directory is correct when the directory contains valid and invalid version files
-    # Create valid version files that will get picked up by the function
-    valid_name_1 = "salt-3001"
-    valid_path_1 = mocked_versions_dir / valid_name_1
-    valid_path_1.write_text("valid")
+            # Ensure every mocked function was called the appropriate number of times
+            mock_exists.assert_called_once()
+            mock_glob.assert_called_once_with("salt-*")
 
-    valid_name_2 = "salt-214"
-    valid_path_2 = mocked_versions_dir / valid_name_2
-    valid_path_2.write_text("valid")
 
-    # Create invalid version files that will get picked up by the function
-    invalid_name_1 = "salt3002"
-    invalid_path_1 = mocked_versions_dir / invalid_name_1
-    invalid_path_1.write_text("invalid")
+async def test_local_version_list3(mock_hub, hub, tmp_path):
+    """
+    SCENARIO #3:
+    - The saltenv_dir directory exists
+    - There are local versions matching the glob pattern
+    """
+    # Link the function to the mock_hub
+    mock_hub.saltenv.ops.local_version_list = hub.saltenv.ops.local_version_list
 
-    invalid_name_2 = "slt-3003"
-    invalid_path_2 = mocked_versions_dir / invalid_name_2
-    invalid_path_2.write_text("invalid")
+    # Rather than mock pathlib.Path, we will just set the mock_hub.OPT.saltenv.saltenv_dir
+    # value because pathlib.Path is not easy to subclass for mocking purposes (issues occur
+    # with the _flavour attribute)
+    mock_hub.OPT.saltenv.saltenv_dir = "existent_dir"
 
-    invalid_name_3 = "rand0m"
-    invalid_path_3 = mocked_versions_dir / invalid_name_3
-    invalid_path_3.write_text("invalid")
+    # Mock Path.exists() to return True
+    with patch("pathlib.PosixPath.exists", return_value=True) as mock_exists:
 
-    # Compare the actual and expected results
-    expected = {
-        valid_name_1.replace("salt-", ""): Path(valid_path_1),
-        valid_name_2.replace("salt-", ""): Path(valid_path_2),
-    }
-    actual = await mock_hub.saltenv.ops.local_version_list()
-    assert expected == actual
+        # Mock Path.glob to return a list of Paths objects
+        mocked_version_path1 = MagicMock()
+        mocked_version_path1.name = "3001"
+        mocked_version_path2 = MagicMock()
+        mocked_version_path2.name = "3004"
+        glob_results = [mocked_version_path1, mocked_version_path2]
+        with patch("pathlib.PosixPath.glob", return_value=glob_results) as mock_glob:
+            # Ensure that the dictionary contains keys for both the mocked versions
+            actual = await mock_hub.saltenv.ops.local_version_list()
+            expected = {"3001": mocked_version_path1, "3004": mocked_version_path2}
+            assert expected == actual
+
+            # Ensure every mocked function was called the appropriate number of times
+            mock_exists.assert_called_once()
+            mock_glob.assert_called_once_with("salt-*")
