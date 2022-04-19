@@ -2,7 +2,7 @@ import mock
 from pathlib import Path
 
 
-async def test_get_current_version1(mock_hub, hub):
+async def test_get_current_version_both_files_dont_exist(mock_hub, hub):
     """
     SCENARIO #1
     - override_version_file DOES NOT EXIST
@@ -22,7 +22,7 @@ async def test_get_current_version1(mock_hub, hub):
         actual == expected
 
 
-async def test_get_current_version2(mock_hub, hub, tmp_path):
+async def test_get_current_version_only_override_exists(mock_hub, hub, tmp_path):
     """
     SCENARIO #2
     - override_version_file DOES EXIST
@@ -50,7 +50,7 @@ async def test_get_current_version2(mock_hub, hub, tmp_path):
         assert actual == expected
 
 
-async def test_get_current_version3(mock_hub, hub, tmp_path):
+async def test_get_current_version_only_main_exists(mock_hub, hub, tmp_path):
     """
     SCENARIO #3
     - override_version_file DOES NOT EXIST
@@ -81,7 +81,7 @@ async def test_get_current_version3(mock_hub, hub, tmp_path):
         assert actual == expected
 
 
-async def test_get_current_version4(mock_hub, hub, tmp_path):
+async def test_get_current_version_both_files_exist(mock_hub, hub, tmp_path):
     """
     SCENARIO #4
     - override_version_file DOES EXIST
