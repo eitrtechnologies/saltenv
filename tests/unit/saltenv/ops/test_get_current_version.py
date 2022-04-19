@@ -6,7 +6,7 @@ from aiofiles import threadpool
 import os
 
 
-async def test_get_current_version_both_files_dont_exist(mock_hub, hub):
+async def test_unit_get_current_version_both_files_dont_exist(mock_hub, hub):
     """
     SCENARIO #1
     - override_version_file DOES NOT EXIST
@@ -23,12 +23,12 @@ async def test_get_current_version_both_files_dont_exist(mock_hub, hub):
         expected = ("", "")
         actual = await mock_hub.saltenv.ops.get_current_version()
         actual == expected
-        
+
         # Ensure every mocked function was called the appropriate number of times
         assert mock_exists.call_count == 2
 
 
-async def test_get_current_version_only_override_exists(mock_hub, hub, tmp_path):
+async def test_unit_get_current_version_only_override_exists(mock_hub, hub, tmp_path):
     """
     SCENARIO #2
     - override_version_file DOES EXIST
@@ -44,14 +44,16 @@ async def test_get_current_version_only_override_exists(mock_hub, hub, tmp_path)
     with patch("os.getcwd", return_value=tmp_path) as mock_cwd:
         # Patch exists to return True the first call and False the second call
         with patch("pathlib.PosixPath.exists", side_effect=[True, False]) as mock_exists:
-            
+
             # Register the return type with aiofiles.threadpool.wrap dispatcher
-            aiofiles.threadpool.wrap.register(MagicMock)(lambda *args, **kwargs: threadpool.AsyncBufferedIOBase(*args, **kwargs))
+            aiofiles.threadpool.wrap.register(MagicMock)(
+                lambda *args, **kwargs: threadpool.AsyncBufferedIOBase(*args, **kwargs)
+            )
 
             # Mock the file returned by aiofiles.open
             mock_override_version = "3004"
             mock_file = MagicMock()
-            with patch('aiofiles.threadpool.sync_open', return_value=mock_file) as mock_open:
+            with patch("aiofiles.threadpool.sync_open", return_value=mock_file) as mock_open:
                 # Set the value of read() to be the mock version
                 mock_file.read.return_value = mock_override_version
                 # Call get_current_version
@@ -66,7 +68,7 @@ async def test_get_current_version_only_override_exists(mock_hub, hub, tmp_path)
                 mock_file.read.assert_called_once()
 
 
-async def test_get_current_version_only_main_exists(mock_hub, hub, tmp_path):
+async def test_unit_get_current_version_only_main_exists(mock_hub, hub, tmp_path):
     """
     SCENARIO #3
     - override_version_file DOES NOT EXIST
@@ -84,12 +86,14 @@ async def test_get_current_version_only_main_exists(mock_hub, hub, tmp_path):
         with patch("pathlib.PosixPath.exists", side_effect=[False, True]) as mock_exists:
 
             # Register the return type with aiofiles.threadpool.wrap dispatcher
-            aiofiles.threadpool.wrap.register(MagicMock)(lambda *args, **kwargs: threadpool.AsyncBufferedIOBase(*args, **kwargs))
+            aiofiles.threadpool.wrap.register(MagicMock)(
+                lambda *args, **kwargs: threadpool.AsyncBufferedIOBase(*args, **kwargs)
+            )
 
             # Mock the file returned by aiofiles.open
             mock_main_version = "3003"
             mock_file = MagicMock()
-            with patch('aiofiles.threadpool.sync_open', return_value=mock_file) as mock_open:
+            with patch("aiofiles.threadpool.sync_open", return_value=mock_file) as mock_open:
                 # Set the value of read() to be the mock version
                 mock_file.read.return_value = mock_main_version
                 # Call get_current_version
@@ -104,7 +108,7 @@ async def test_get_current_version_only_main_exists(mock_hub, hub, tmp_path):
                 mock_file.read.assert_called_once()
 
 
-async def test_get_current_version_both_files_exist(mock_hub, hub, tmp_path):
+async def test_unit_get_current_version_both_files_exist(mock_hub, hub, tmp_path):
     """
     SCENARIO #4
     - override_version_file DOES EXIST
@@ -122,7 +126,9 @@ async def test_get_current_version_both_files_exist(mock_hub, hub, tmp_path):
         with patch("pathlib.PosixPath.exists", side_effect=[True, True]) as mock_exists:
 
             # Register the return type with aiofiles.threadpool.wrap dispatcher
-            aiofiles.threadpool.wrap.register(MagicMock)(lambda *args, **kwargs: threadpool.AsyncBufferedIOBase(*args, **kwargs))
+            aiofiles.threadpool.wrap.register(MagicMock)(
+                lambda *args, **kwargs: threadpool.AsyncBufferedIOBase(*args, **kwargs)
+            )
 
             # Mock the file returned by aiofiles.open
             mock_override_version = "3004"
@@ -134,7 +140,9 @@ async def test_get_current_version_both_files_exist(mock_hub, hub, tmp_path):
             # Set the value of read() to "3003"
             mock_main_file.read.return_value = mock_main_file
             # Set the open() to return the mocked file for override and then the mocked file for main
-            with patch('aiofiles.threadpool.sync_open', side_effect=[mock_override_file, mock_main_file]) as mock_open:
+            with patch(
+                "aiofiles.threadpool.sync_open", side_effect=[mock_override_file, mock_main_file]
+            ) as mock_open:
                 # Call get_current_version
                 expected = (mock_override_version, tmp_path / ".salt-version")
                 actual = await mock_hub.saltenv.ops.get_current_version()

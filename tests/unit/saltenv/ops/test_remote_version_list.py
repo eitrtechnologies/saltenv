@@ -2,7 +2,7 @@ import mock
 from pathlib import Path
 
 
-async def test_remote_version_list1(mock_hub, hub):
+async def test_unit_remote_version_list1(mock_hub, hub):
     """
     SCENARIO #1:
     - There was a valid response recieved by the GET request
@@ -33,7 +33,7 @@ async def test_remote_version_list1(mock_hub, hub):
     assert expected == actual
 
 
-async def test_remote_version_list2(mock_hub, hub):
+async def test_unit_remote_version_list2(mock_hub, hub):
     """
     SCENARIO #2:
     - There was a invalid response recieved by the GET request (no "ret" value)
@@ -57,7 +57,7 @@ async def test_remote_version_list2(mock_hub, hub):
     assert expected == actual
 
 
-async def test_remote_version_list3(mock_hub, hub):
+async def test_unit_remote_version_list3(mock_hub, hub):
     """
     SCENARIO #2:
     - There was a invalid response recieved by the GET request (Actual error such as 404 -- Bad Response)

@@ -3,7 +3,7 @@ from pathlib import Path, PosixPath, PurePosixPath
 import pathlib
 
 
-async def test_local_version_list_nonexistent_versions_dir(mock_hub, hub):
+async def test_unit_local_version_list_nonexistent_versions_dir(mock_hub, hub):
     """
     SCENARIO #1:
     - The versions_dir directory does not exist
@@ -27,7 +27,9 @@ async def test_local_version_list_nonexistent_versions_dir(mock_hub, hub):
         mock_exists.assert_called_once()
 
 
-async def test_local_version_list_version_dir_exists_no_local_versions(mock_hub, hub, tmp_path):
+async def test_unit_local_version_list_version_dir_exists_no_local_versions(
+    mock_hub, hub, tmp_path
+):
     """
     SCENARIO #2:
     - The versions_dir directory exists
@@ -56,7 +58,7 @@ async def test_local_version_list_version_dir_exists_no_local_versions(mock_hub,
             mock_glob.assert_called_once_with("salt-*")
 
 
-async def test_local_version_list_version_dir_exists_local_versions(mock_hub, hub, tmp_path):
+async def test_unit_local_version_list_version_dir_exists_local_versions(mock_hub, hub, tmp_path):
     """
     SCENARIO #3:
     - The saltenv_dir directory exists

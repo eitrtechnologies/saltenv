@@ -1,9 +1,13 @@
-import mock
-from pathlib import Path
+from unittest.mock import patch, MagicMock, AsyncMock
+from pathlib import Path, PosixPath, PurePosixPath
+import pathlib
 import aiofiles
+from aiofiles import threadpool
 
 
-async def test_use_version1(mock_hub, hub, tmp_path, capfd):
+async def test_unit_use_version_no_local_version_nonexistent_version(
+    mock_hub, hub, tmp_path, capfd
+):
     """
     SCENARIO #1:
     - No local versions
@@ -12,16 +16,11 @@ async def test_use_version1(mock_hub, hub, tmp_path, capfd):
     # Link the function to the mock_hub
     mock_hub.saltenv.ops.use_version = hub.saltenv.ops.use_version
 
-    # Mock the fill_local_version_list function so it does not do anything
-    mock_hub.saltenv.ops.fill_local_version_list.return_value = mock.MagicMock()
-
-    # Set up the mocked versions directory
-    mock_hub.OPT.saltenv.saltenv_dir = tmp_path
-    mocked_versions_dir = tmp_path / "versions"
-    mocked_versions_dir.mkdir()
-
     # Set LOCAL_VERSIONS as an empty dict
     mock_hub.saltenv.ops.LOCAL_VERSIONS = {}
+
+    # Mock the fill_local_version_list function so it returns an empty list
+    mock_hub.saltenv.ops.fill_local_version_list.return_value = []
 
     # Call use_version and confirm it passed successfully
     version = "3001"
@@ -33,12 +32,11 @@ async def test_use_version1(mock_hub, hub, tmp_path, capfd):
     expected_stdout = f"{version} is not installed. Run 'saltenv install {version}' first.\n"
     assert actual_stdout == expected_stdout
 
-    # Confirm that fill_local_version_list was called once because LOCAL_VERSIONS
-    # is empty.
+    # Ensure every mocked function was called the appropriate number of times
     mock_hub.saltenv.ops.fill_local_version_list.assert_called_once()
 
 
-async def test_use_version2(mock_hub, hub, tmp_path, capfd):
+async def test_unit_use_version_local_versions_nonexistent_version(mock_hub, hub, tmp_path, capfd):
     """
     SCENARIO #2:
     - There are local versions
@@ -47,26 +45,10 @@ async def test_use_version2(mock_hub, hub, tmp_path, capfd):
     # Link the function to the mock_hub
     mock_hub.saltenv.ops.use_version = hub.saltenv.ops.use_version
 
-    # Mock the fill_local_version_list function so it does not do anything.
-    # However, it should not be called at all (tested below)
-    mock_hub.saltenv.ops.fill_local_version_list.return_value = mock.MagicMock()
-
-    # Set up the mocked versions directory
-    mock_hub.OPT.saltenv.saltenv_dir = tmp_path
-    mocked_versions_dir = tmp_path / "versions"
-    mocked_versions_dir.mkdir()
-
-    # Create the two version files to include in LOCAL_VERSIONS
-    valid_path_3001 = mocked_versions_dir / "salt-3001"
-    valid_path_3001.write_text("valid")
-
-    valid_path_3004 = mocked_versions_dir / "salt-3004"
-    valid_path_3004.write_text("valid")
-
-    # Set LOCAL_VERSIONS as an empty dict
+    # Set LOCAL_VERSIONS to contain two versions
     mock_hub.saltenv.ops.LOCAL_VERSIONS = {
-        "3001": Path(valid_path_3001),
-        "3004": Path(valid_path_3004),
+        "3001": Path(tmp_path) / "salt-3001",
+        "3004": Path(tmp_path) / "salt-3004",
     }
 
     # Call use_version and confirm it passed successfully
@@ -74,60 +56,54 @@ async def test_use_version2(mock_hub, hub, tmp_path, capfd):
     actual_ret = await mock_hub.saltenv.ops.use_version(version)
     actual_ret == True
 
-    # Confirm that fill_local_version_list was not ever called
-    assert not mock_hub.saltenv.ops.fill_local_version_list.called
-
     # Check that the expected warning was printed
     actual_stdout, err = capfd.readouterr()
     expected_stdout = f"{version} is not installed. Run 'saltenv install {version}' first.\n"
     assert actual_stdout == expected_stdout
 
+    # Ensure every mocked function was called the appropriate number of times
+    mock_hub.saltenv.ops.fill_local_version_list.assert_not_called()
 
-async def test_use_version3(mock_hub, hub, tmp_path):
+
+async def test_unit_use_version_local_versions_existent_version(mock_hub, hub, tmp_path):
     """
     SCENARIO #3:
     - There are local versions
-    - A version that does exist is specified
+    - A version that exists is specified
     """
     # Link the function to the mock_hub
     mock_hub.saltenv.ops.use_version = hub.saltenv.ops.use_version
 
-    # Mock the fill_local_version_list function so it does not do anything.
-    # However, it should not be called at all (tested below)
-    mock_hub.saltenv.ops.fill_local_version_list.return_value = mock.MagicMock()
-
-    # Set up the mocked versions file and directory
-    mock_hub.OPT.saltenv.saltenv_dir = tmp_path
-    # File
-    mocked_version_file = tmp_path / "version"
-    mocked_version_file.write_text("")
-    # Directory
-    mocked_versions_dir = tmp_path / "versions"
-    mocked_versions_dir.mkdir()
-
-    # Create the two version files to include in LOCAL_VERSIONS
-    valid_path_3001 = mocked_versions_dir / "salt-3001"
-    valid_path_3001.write_text("")
-
-    valid_path_3004 = mocked_versions_dir / "salt-3004"
-    valid_path_3004.write_text("")
-
-    # Set LOCAL_VERSIONS as an empty dict
+    # Set LOCAL_VERSIONS to contain two versions
     mock_hub.saltenv.ops.LOCAL_VERSIONS = {
-        "3001": Path(valid_path_3001),
-        "3004": Path(valid_path_3004),
+        "3001": Path(tmp_path) / "salt-3001",
+        "3004": Path(tmp_path) / "salt-3004",
     }
 
-    # Call use_version and confirm it passed successfully
-    version = "3004"
-    actual_ret = await mock_hub.saltenv.ops.use_version(version)
-    actual_ret == True
+    # Set the saltenv_dir value as the mock directory
+    mock_hub.OPT.saltenv.saltenv_dir = tmp_path
 
-    # Confirm that fill_local_version_list was not ever called
-    assert not mock_hub.saltenv.ops.fill_local_version_list.called
+    # Patch mkdir to do nothing
+    with patch("pathlib.PosixPath.mkdir", return_value=None) as mock_mkdir:
 
-    # Confirm that the version file now has the correct version specified
-    actual_vfile_contents = None
-    async with aiofiles.open(mocked_version_file, "r") as vfile:
-        actual_vfile_contents = await vfile.read()
-    assert actual_vfile_contents == version
+        # Register the return type with aiofiles.threadpool.wrap dispatcher
+        aiofiles.threadpool.wrap.register(MagicMock)(
+            lambda *args, **kwargs: threadpool.AsyncBufferedIOBase(*args, **kwargs)
+        )
+
+        # Mock the file returned by aiofiles.open
+        mock_version_file = MagicMock()
+        with patch("aiofiles.threadpool.sync_open", return_value=mock_version_file) as mock_open:
+            mock_version_file.write.side_effect = None
+
+            # Call use_version and confirm it passed successfully
+            version = "3004"
+            actual_ret = await mock_hub.saltenv.ops.use_version(version)
+            actual_ret == True
+
+            # Ensure every mocked function was called the appropriate number of times
+            mock_hub.saltenv.ops.fill_local_version_list.assert_not_called()
+            mock_mkdir.assert_called_once()
+            mock_open.assert_called_once()
+            mock_mkdir.assert_called_once()
+            mock_version_file.write.assert_called_once()

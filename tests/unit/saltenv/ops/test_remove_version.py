@@ -2,20 +2,8 @@ from unittest.mock import patch, MagicMock
 from pathlib import Path, PosixPath, PurePosixPath
 import pathlib
 
-"""
-async def remove_version(hub, version, **kwargs):
-    '''
-    This is the entrypoint for the async code in your project
-    '''
-    salt_bin = hub.saltenv.ops.LOCAL_VERSIONS.get(version)
-    if salt_bin:
-        salt_bin.unlink()
 
-    return True
-"""
-
-
-async def test_remove_version_exists(mock_hub, hub, tmp_path):
+async def test_unit_remove_version_exists(mock_hub, hub, tmp_path):
     """
     SCENARIO #1:
     - The version exists within LOCAL_VERSIONS
@@ -26,7 +14,7 @@ async def test_remove_version_exists(mock_hub, hub, tmp_path):
     # Add two versions to LOCAL_VERSIONS
     mock_hub.saltenv.ops.LOCAL_VERSIONS = {
         "3001": Path(tmp_path / "3001"),
-        "3004": Path(tmp_path / "3004")
+        "3004": Path(tmp_path / "3004"),
     }
 
     with patch("pathlib.PosixPath.unlink", return_value=None) as mock_unlink:
@@ -38,7 +26,7 @@ async def test_remove_version_exists(mock_hub, hub, tmp_path):
         mock_unlink.assert_called_once()
 
 
-async def test_remove_version_does_not_exist(mock_hub, hub, tmp_path):
+async def test_unit_remove_version_does_not_exist(mock_hub, hub, tmp_path):
     """
     SCENARIO #2:
     - The version does not exist within LOCAL_VERSIONS
@@ -49,7 +37,7 @@ async def test_remove_version_does_not_exist(mock_hub, hub, tmp_path):
     # Add two versions to LOCAL_VERSIONS
     mock_hub.saltenv.ops.LOCAL_VERSIONS = {
         "3001": Path(tmp_path / "3001"),
-        "3004": Path(tmp_path / "3004")
+        "3004": Path(tmp_path / "3004"),
     }
 
     with patch("pathlib.PosixPath.unlink", return_value=None) as mock_unlink:
@@ -61,7 +49,7 @@ async def test_remove_version_does_not_exist(mock_hub, hub, tmp_path):
         mock_unlink.assert_not_called()
 
 
-async def test_remove_version_empty_local_versions(mock_hub, hub):
+async def test_unit_remove_version_empty_local_versions(mock_hub, hub):
     """
     SCENARIO #3:
     - LOCAL_VERSIONS is empty

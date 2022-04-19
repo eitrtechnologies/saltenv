@@ -2,7 +2,8 @@ from pathlib import Path
 import aiofiles
 from unittest.mock import patch, MagicMock
 
-async def test_pin_current_version_no_active_version(mock_hub, hub, tmp_path):
+
+async def test_unit_pin_current_version_no_active_version(mock_hub, hub, tmp_path):
     """
     SCENARIO #1:
     - There is no active version
@@ -26,25 +27,7 @@ async def test_pin_current_version_no_active_version(mock_hub, hub, tmp_path):
         actual == expected
 
 
-"""
-async def pin_current_version(hub, **kwargs):
-    '''
-    Get the current active version and write it to ./.salt-version
-    '''
-    ret = False
-    current_version = await hub.saltenv.ops.get_current_version()
-    override_version_file = Path(os.getcwd()) / ".salt-version"
-
-    if current_version[0]:
-        async with aiofiles.open(override_version_file, "w") as ofile:
-            await ofile.write(current_version[0])
-        ret = True
-
-    return ret
-"""
-
-
-async def test_pin_current_version_active_version(mock_hub, hub, tmp_path):
+async def test_unit_pin_current_version_active_version(mock_hub, hub, tmp_path):
     """
     SCENARIO #2:
     - There is an active version
@@ -58,7 +41,7 @@ async def test_pin_current_version_active_version(mock_hub, hub, tmp_path):
     existing_override_version = "3004"
     mock_hub.saltenv.ops.get_current_version.return_value = (
         existing_override_version,
-        str(tmp_path / "version")
+        str(tmp_path / "version"),
     )
 
     # Check that pin_current_version return True AND that the
