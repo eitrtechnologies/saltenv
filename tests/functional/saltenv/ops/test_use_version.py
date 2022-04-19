@@ -3,7 +3,9 @@ from pathlib import Path
 import aiofiles
 
 
-async def test_use_version1(mock_hub, hub, tmp_path, capfd):
+async def test_func_use_version_no_local_version_nonexistent_version(
+    mock_hub, hub, tmp_path, capfd
+):
     """
     SCENARIO #1:
     - No local versions
@@ -38,7 +40,7 @@ async def test_use_version1(mock_hub, hub, tmp_path, capfd):
     mock_hub.saltenv.ops.fill_local_version_list.assert_called_once()
 
 
-async def test_use_version2(mock_hub, hub, tmp_path, capfd):
+async def test_func_use_version_local_versions_nonexistent_version(mock_hub, hub, tmp_path, capfd):
     """
     SCENARIO #2:
     - There are local versions
@@ -63,7 +65,7 @@ async def test_use_version2(mock_hub, hub, tmp_path, capfd):
     valid_path_3004 = mocked_versions_dir / "salt-3004"
     valid_path_3004.write_text("valid")
 
-    # Set LOCAL_VERSIONS as an empty dict
+    # Set LOCAL_VERSIONS to contain two versions
     mock_hub.saltenv.ops.LOCAL_VERSIONS = {
         "3001": Path(valid_path_3001),
         "3004": Path(valid_path_3004),
@@ -83,11 +85,11 @@ async def test_use_version2(mock_hub, hub, tmp_path, capfd):
     assert actual_stdout == expected_stdout
 
 
-async def test_use_version3(mock_hub, hub, tmp_path):
+async def test_func_use_version_local_versions_existent_version(mock_hub, hub, tmp_path):
     """
     SCENARIO #3:
     - There are local versions
-    - A version that does exist is specified
+    - A version that exists is specified
     """
     # Link the function to the mock_hub
     mock_hub.saltenv.ops.use_version = hub.saltenv.ops.use_version
@@ -112,7 +114,7 @@ async def test_use_version3(mock_hub, hub, tmp_path):
     valid_path_3004 = mocked_versions_dir / "salt-3004"
     valid_path_3004.write_text("")
 
-    # Set LOCAL_VERSIONS as an empty dict
+    # Set LOCAL_VERSIONS to contain two versions
     mock_hub.saltenv.ops.LOCAL_VERSIONS = {
         "3001": Path(valid_path_3001),
         "3004": Path(valid_path_3004),

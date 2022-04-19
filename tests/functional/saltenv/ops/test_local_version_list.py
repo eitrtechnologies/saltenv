@@ -2,10 +2,10 @@ import mock
 from pathlib import Path
 
 
-async def test_local_version_list1(mock_hub, hub):
+async def test_func_local_version_list_nonexistent_dir(mock_hub, hub):
     """
     SCENARIO #1:
-    - The saltenv_dir directory does not exist
+    - The versions directory does not exist
     """
     # Link the function to the mock_hub
     mock_hub.saltenv.ops.local_version_list = hub.saltenv.ops.local_version_list
@@ -15,10 +15,10 @@ async def test_local_version_list1(mock_hub, hub):
     assert expected == actual
 
 
-async def test_local_version_list2(mock_hub, hub, tmp_path):
+async def test_func_local_version_list_existent_dir(mock_hub, hub, tmp_path):
     """
     SCENARIO #2:
-    - The saltenv_dir directory exists
+    - The versions directory exists
     """
     # Link the function to the mock_hub
     mock_hub.saltenv.ops.local_version_list = hub.saltenv.ops.local_version_list

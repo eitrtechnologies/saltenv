@@ -2,7 +2,8 @@ import mock
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
-async def test_pin_current_version_no_active_version(mock_hub, hub, tmp_path):
+
+async def test_func_pin_current_version_no_active_version(mock_hub, hub, tmp_path):
     """
     SCENARIO #1:
     - There is no active version
@@ -33,7 +34,7 @@ async def test_pin_current_version_no_active_version(mock_hub, hub, tmp_path):
         assert mocked_override_file.read_text() == existing_override_version
 
 
-async def test_pin_current_version_active_version_matches_override(mock_hub, hub, tmp_path):
+async def test_func_pin_current_version_active_version_matches_override(mock_hub, hub, tmp_path):
     """
     SCENARIO #2:
     - There is an active version
@@ -47,7 +48,7 @@ async def test_pin_current_version_active_version_matches_override(mock_hub, hub
     existing_override_version = "3004"
     mock_hub.saltenv.ops.get_current_version.return_value = (
         existing_override_version,
-        str(tmp_path / "version")
+        str(tmp_path / "version"),
     )
 
     # Check that pin_current_version return True AND that the
@@ -68,7 +69,9 @@ async def test_pin_current_version_active_version_matches_override(mock_hub, hub
         assert mocked_override_file.read_text() == existing_override_version
 
 
-async def test_pin_current_version_active_version_does_not_match_override(mock_hub, hub, tmp_path):
+async def test_func_pin_current_version_active_version_does_not_match_override(
+    mock_hub, hub, tmp_path
+):
     """
     SCENARIO #3:
     - There is an active version
@@ -82,7 +85,7 @@ async def test_pin_current_version_active_version_does_not_match_override(mock_h
     updated_override_version = "3004"
     mock_hub.saltenv.ops.get_current_version.return_value = (
         updated_override_version,
-        str(tmp_path / "version")
+        str(tmp_path / "version"),
     )
 
     # Check that pin_current_version return True AND that the
