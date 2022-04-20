@@ -13,8 +13,8 @@ async def test_unit_remove_version_exists(mock_hub, hub, tmp_path):
 
     # Add two versions to LOCAL_VERSIONS
     mock_hub.saltenv.ops.LOCAL_VERSIONS = {
-        "3001": Path(tmp_path / "3001"),
-        "3004": Path(tmp_path / "3004"),
+        "3001": Path(tmp_path / "salt-3001"),
+        "3004": Path(tmp_path / "salt-3004"),
     }
 
     with patch("pathlib.PosixPath.unlink", return_value=None) as mock_unlink:
@@ -36,8 +36,8 @@ async def test_unit_remove_version_does_not_exist(mock_hub, hub, tmp_path):
 
     # Add two versions to LOCAL_VERSIONS
     mock_hub.saltenv.ops.LOCAL_VERSIONS = {
-        "3001": Path(tmp_path / "3001"),
-        "3004": Path(tmp_path / "3004"),
+        "3001": Path(tmp_path / "salt-3001"),
+        "3004": Path(tmp_path / "salt-3004"),
     }
 
     with patch("pathlib.PosixPath.unlink", return_value=None) as mock_unlink:

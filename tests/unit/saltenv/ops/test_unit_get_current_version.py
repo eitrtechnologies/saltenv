@@ -6,7 +6,7 @@ from aiofiles import threadpool
 import os
 
 
-async def test_unit_get_current_version_both_files_dont_exist(mock_hub, hub):
+async def test_unit_get_current_version_both_files_dont_exist(mock_hub, hub, tmp_path):
     """
     SCENARIO #1
     - override_version_file DOES NOT EXIST
@@ -18,14 +18,17 @@ async def test_unit_get_current_version_both_files_dont_exist(mock_hub, hub):
     # Set the saltenv_dir as a nonexistent directory
     mock_hub.OPT.saltenv.saltenv_dir = "nonexistent_testing_dir"
 
-    # Patch the exists function to return False for both times it is called
-    with patch("pathlib.PosixPath.exists", side_effect=[False, False]) as mock_exists:
-        expected = ("", "")
-        actual = await mock_hub.saltenv.ops.get_current_version()
-        actual == expected
+    # Patch os.getcwd() to be the mock directory
+    with patch("os.getcwd", return_value=tmp_path) as mock_cwd:
+        # Patch the exists function to return False for both times it is called
+        with patch("pathlib.PosixPath.exists", side_effect=[False, False]) as mock_exists:
+            expected = ("", "")
+            actual = await mock_hub.saltenv.ops.get_current_version()
+            actual == expected
 
-        # Ensure every mocked function was called the appropriate number of times
-        assert mock_exists.call_count == 2
+            # Ensure every mocked function was called the appropriate number of times
+            mock_cwd.assert_called_once()
+            assert mock_exists.call_count == 2
 
 
 async def test_unit_get_current_version_only_override_exists(mock_hub, hub, tmp_path):

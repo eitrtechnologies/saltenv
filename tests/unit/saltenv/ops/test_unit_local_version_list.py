@@ -77,9 +77,9 @@ async def test_unit_local_version_list_version_dir_exists_local_versions(mock_hu
 
         # Mock Path.glob to return a list of Paths objects
         mocked_version_path1 = MagicMock()
-        mocked_version_path1.name = "3001"
+        mocked_version_path1.name = "salt-3001"
         mocked_version_path2 = MagicMock()
-        mocked_version_path2.name = "3004"
+        mocked_version_path2.name = "salt-3004"
         glob_results = [mocked_version_path1, mocked_version_path2]
         with patch("pathlib.PosixPath.glob", return_value=glob_results) as mock_glob:
             # Ensure that the dictionary contains keys for both the mocked versions
