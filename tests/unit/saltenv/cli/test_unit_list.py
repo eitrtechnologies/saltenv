@@ -29,6 +29,10 @@ async def test_unit_list_no_local_no_current(mock_hub, hub, capfd):
     expected_stdout = "\n"
     assert actual_stdout == expected_stdout
 
+    # Ensure every mocked function was called the appropriate number of times
+    mock_hub.saltenv.ops.fill_local_version_list.assert_called_once()
+    mock_hub.saltenv.ops.get_current_version.assert_called_once()
+
 
 async def test_list_local_no_current(mock_hub, hub, tmp_path, capfd):
     """
@@ -58,6 +62,10 @@ async def test_list_local_no_current(mock_hub, hub, tmp_path, capfd):
     actual_stdout, err = capfd.readouterr()
     expected_stdout = "  3004\n  3001\n"
     assert actual_stdout == expected_stdout
+
+    # Ensure every mocked function was called the appropriate number of times
+    mock_hub.saltenv.ops.fill_local_version_list.assert_called_once()
+    mock_hub.saltenv.ops.get_current_version.assert_called_once()
 
 
 async def test_list_local_current(mock_hub, hub, tmp_path, capfd):
@@ -89,3 +97,7 @@ async def test_list_local_current(mock_hub, hub, tmp_path, capfd):
     actual_stdout, err = capfd.readouterr()
     expected_stdout = f"  3004\n* 3001 (set by {mock_current_version_path})\n"
     assert actual_stdout == expected_stdout
+
+    # Ensure every mocked function was called the appropriate number of times
+    mock_hub.saltenv.ops.fill_local_version_list.assert_called_once()
+    mock_hub.saltenv.ops.get_current_version.assert_called_once()

@@ -25,6 +25,9 @@ async def test_unit_list_remote_empty(mock_hub, hub, capfd):
     expected_stdout = "\n"
     assert actual_stdout == expected_stdout
 
+    # Ensure every mocked function was called the appropriate number of times
+    mock_hub.saltenv.ops.fill_remote_version_list.assert_called_once()
+
 
 async def test_unit_list_remote_nonempty(mock_hub, hub, tmp_path, capfd):
     """
@@ -53,3 +56,6 @@ async def test_unit_list_remote_nonempty(mock_hub, hub, tmp_path, capfd):
     actual_stdout, err = capfd.readouterr()
     expected_stdout = "latest\n3004rc1\n3004\n3003.3\n3003\n"
     assert actual_stdout == expected_stdout
+
+    # Ensure every mocked function was called the appropriate number of times
+    mock_hub.saltenv.ops.fill_remote_version_list.assert_called_once()
