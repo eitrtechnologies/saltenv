@@ -1,4 +1,3 @@
-import mock
 from pathlib import Path
 
 

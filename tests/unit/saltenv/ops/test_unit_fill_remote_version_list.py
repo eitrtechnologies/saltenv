@@ -1,7 +1,3 @@
-import mock
-from pathlib import Path
-
-
 async def test_unit_fill_remote_version_list(mock_hub, hub):
     # Link the function to the mock_hub
     mock_hub.saltenv.ops.fill_remote_version_list = hub.saltenv.ops.fill_remote_version_list

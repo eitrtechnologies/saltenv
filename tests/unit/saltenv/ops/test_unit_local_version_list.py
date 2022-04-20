@@ -1,6 +1,5 @@
-from unittest.mock import patch, MagicMock
-from pathlib import Path, PosixPath, PurePosixPath
-import pathlib
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 
 async def test_unit_local_version_list_nonexistent_versions_dir(mock_hub, hub):

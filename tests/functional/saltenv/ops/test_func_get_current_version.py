@@ -1,5 +1,5 @@
-import mock
 from pathlib import Path
+from unittest import mock
 
 
 async def test_func_get_current_version_both_files_dont_exist(mock_hub, hub):

@@ -1,6 +1,5 @@
-from unittest.mock import patch, MagicMock
-from pathlib import Path, PosixPath, PurePosixPath
-import pathlib
+from pathlib import Path
+from unittest.mock import patch
 
 
 async def test_unit_remove_version_exists(mock_hub, hub, tmp_path):

@@ -1,7 +1,3 @@
-import mock
-from pathlib import Path
-
-
 async def test_unit_remote_version_list_valid_response(mock_hub, hub):
     """
     SCENARIO #1:

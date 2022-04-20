@@ -1,6 +1,6 @@
-from unittest.mock import patch, MagicMock, AsyncMock
-from pathlib import Path, PosixPath, PurePosixPath
-import pathlib
+from unittest.mock import MagicMock
+from unittest.mock import patch
+
 import aiofiles
 from aiofiles import threadpool
 

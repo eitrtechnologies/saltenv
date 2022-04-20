@@ -1,9 +1,8 @@
-from unittest.mock import patch, MagicMock, AsyncMock
-from pathlib import Path, PosixPath, PurePosixPath
-import pathlib
+from unittest.mock import MagicMock
+from unittest.mock import patch
+
 import aiofiles
 from aiofiles import threadpool
-import os
 
 
 async def test_unit_get_current_version_both_files_dont_exist(mock_hub, hub, tmp_path):
@@ -138,7 +137,6 @@ async def test_unit_get_current_version_both_files_exist(mock_hub, hub, tmp_path
             mock_override_file = MagicMock()
             # Set the value of read() to "3004"
             mock_override_file.read.return_value = mock_override_version
-            mock_main_version = "3003"
             mock_main_file = MagicMock()
             # Set the value of read() to "3003"
             mock_main_file.read.return_value = mock_main_file
