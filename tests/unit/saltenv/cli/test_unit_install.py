@@ -1,6 +1,5 @@
-from unittest.mock import patch, MagicMock, AsyncMock
-from pathlib import Path, PosixPath, PurePosixPath
-import pathlib
+from pathlib import Path
+from unittest.mock import MagicMock
 
 
 async def test_unit_install_empty_version_dicts(mock_hub, hub, capfd):
@@ -14,7 +13,7 @@ async def test_unit_install_empty_version_dicts(mock_hub, hub, capfd):
     mock_hub.saltenv.cli.install = hub.saltenv.cli.install
 
     # Mock the fill functions to do nothing to do nothing
-    mock_hub.saltenv.ops.fill_local_version_list.return_value = None
+    mock_hub.saltenv.ops.fill_remote_version_list.return_value = None
     mock_hub.saltenv.ops.fill_local_version_list.return_value = None
 
     # Set the VERSIONS dicts to be {}
@@ -51,7 +50,7 @@ async def test_unit_install_nonempty_version_dicts_nonmatching_salt_version(
     mock_hub.saltenv.cli.install = hub.saltenv.cli.install
 
     # Mock the fill functions to do nothing to do nothing
-    mock_hub.saltenv.ops.fill_local_version_list.return_value = None
+    mock_hub.saltenv.ops.fill_remote_version_list.return_value = None
     mock_hub.saltenv.ops.fill_local_version_list.return_value = None
 
     # Set the VERSIONS dicts to contain data
@@ -97,7 +96,7 @@ async def test_unit_install_nonempty_local_empty_remote_matching_salt_version(
     mock_hub.saltenv.cli.install = hub.saltenv.cli.install
 
     # Mock the fill functions to do nothing to do nothing
-    mock_hub.saltenv.ops.fill_local_version_list.return_value = None
+    mock_hub.saltenv.ops.fill_remote_version_list.return_value = None
     mock_hub.saltenv.ops.fill_local_version_list.return_value = None
 
     # Set the LOCAL_VERSIONS dict to be nonempty
@@ -138,7 +137,7 @@ async def test_unit_install_empty_local_nonempty_remote_matching_salt_version(
     mock_hub.saltenv.cli.install = hub.saltenv.cli.install
 
     # Mock the fill functions to do nothing to do nothing
-    mock_hub.saltenv.ops.fill_local_version_list.return_value = None
+    mock_hub.saltenv.ops.fill_remote_version_list.return_value = None
     mock_hub.saltenv.ops.fill_local_version_list.return_value = None
 
     # Set the LOCAL_VERSIONS dict to be empty
@@ -172,28 +171,11 @@ async def test_unit_install_empty_local_nonempty_remote_matching_salt_version(
     mock_hub.saltenv.ops.download_version.assert_called_once_with("3004")
 
 
-"""
-async def install(hub, **kwargs):
-    '''
-    This is the entrypoint for the async code in your project
-    '''
-    await hub.saltenv.ops.fill_remote_version_list()
-    await hub.saltenv.ops.fill_local_version_list()
-
-    if hub.OPT.saltenv.salt_version in hub.saltenv.ops.LOCAL_VERSIONS:
-        print(f"{hub.OPT.saltenv.salt_version} is already installed.")
-    elif hub.OPT.saltenv.salt_version in hub.saltenv.ops.REMOTE_VERSIONS:
-        await hub.saltenv.ops.download_version(hub.OPT.saltenv.salt_version)
-    else:
-        print(f"ERROR: {hub.OPT.saltenv.salt_version} is not available as a binary.")
-"""
-
-
 async def test_unit_install_nonempty_local_nonempty_remote_matching_salt_version(
     mock_hub, hub, tmp_path, capfd
 ):
     """
-    SCENARIO #4:
+    SCENARIO #5:
     - Local versions
     - Remote versions
     - Matching salt version
@@ -202,7 +184,7 @@ async def test_unit_install_nonempty_local_nonempty_remote_matching_salt_version
     mock_hub.saltenv.cli.install = hub.saltenv.cli.install
 
     # Mock the fill functions to do nothing to do nothing
-    mock_hub.saltenv.ops.fill_local_version_list.return_value = None
+    mock_hub.saltenv.ops.fill_remote_version_list.return_value = None
     mock_hub.saltenv.ops.fill_local_version_list.return_value = None
 
     # Set the VERSION dicts to be nonempty

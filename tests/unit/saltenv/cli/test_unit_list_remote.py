@@ -1,8 +1,3 @@
-from unittest.mock import patch, MagicMock, AsyncMock
-from pathlib import Path, PosixPath, PurePosixPath
-import pathlib
-
-
 async def test_unit_list_remote_empty(mock_hub, hub, capfd):
     """
     SCENARIO #1:

@@ -1,6 +1,4 @@
-from unittest.mock import patch, MagicMock, AsyncMock
-from pathlib import Path, PosixPath, PurePosixPath
-import pathlib
+from pathlib import Path
 
 
 async def test_unit_list_no_local_no_current(mock_hub, hub, capfd):
