@@ -4,6 +4,15 @@ This project uses [Semantic Versioning](https://semver.org/) - MAJOR.MINOR.PATCH
 
 # Changelog
 
+Saltenv 0.2.0 (2022-07-07)
+==========================
+
+Fixed
+-----
+
+- swap idem-aiohttp for pop-aiohttp (#5)
+
+
 Saltenv 0.1.1 (2022-03-22)
 ==========================
 
