@@ -2,7 +2,7 @@ def __init__(hub):
     # Remember not to start your app in the __init__ function
     # This function should just be used to set up the plugin subsystem
     # The run.py is where your app should usually start
-    for dyne in ["acct", "exec", "idem", "tool"]:
+    for dyne in ["acct", "exec", "tool"]:
         hub.pop.sub.add(dyne_name=dyne)
     for dyne in ["exec", "tool"]:
         hub.pop.sub.load_subdirs(getattr(hub, dyne), recurse=True)

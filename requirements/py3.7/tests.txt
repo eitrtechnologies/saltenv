@@ -5,18 +5,15 @@
 #    pip-compile --output-file=requirements/py3.7/tests.txt requirements/tests.in
 #
 acct==6.5.0
-    # via
-    #   idem
-    #   pop-evbus
+    # via pop-aiohttp
 aiodns==3.0.0
     # via aiohttp
 aiofiles==0.8.0
     # via
     #   acct
     #   dict-toolbox
-    #   idem
 aiohttp[speedups]==3.8.1
-    # via idem-aiohttp
+    # via pop-aiohttp
 aiosignal==1.2.0
     # via aiohttp
 async-timeout==4.0.2
@@ -51,7 +48,6 @@ cryptography==36.0.2
 dict-toolbox==2.2.0
     # via
     #   acct
-    #   idem
     #   pop
     #   pop-config
     #   rend
@@ -59,10 +55,6 @@ frozenlist==1.3.0
     # via
     #   aiohttp
     #   aiosignal
-idem-aiohttp==3.0.0
-    # via -r requirements/base.txt
-idem==18.2.2
-    # via idem-aiohttp
 idna==3.3
     # via yarl
 importlib-metadata==4.11.3
@@ -72,11 +64,7 @@ importlib-metadata==4.11.3
 iniconfig==1.1.1
     # via pytest
 jinja2==3.0.3
-    # via
-    #   idem
-    #   rend
-jmespath==1.0.0
-    # via idem
+    # via rend
 markupsafe==2.1.1
     # via jinja2
 mock==4.0.3
@@ -87,8 +75,6 @@ msgpack==1.0.3
     # via
     #   acct
     #   dict-toolbox
-    #   pop-evbus
-    #   pop-serial
 multidict==6.0.2
     # via
     #   aiohttp
@@ -101,33 +87,24 @@ packaging==21.3
     # via pytest
 pluggy==1.0.0
     # via pytest
+pop-aiohttp==1.0.0
+    # via -r requirements/base.txt
 pop-config==9.0.0
     # via
     #   acct
-    #   idem
-    #   idem-aiohttp
     #   pop
-pop-evbus==6.1.0
-    # via idem
+    #   pop-aiohttp
 pop-loop==1.0.4
     # via
-    #   idem
-    #   idem-aiohttp
     #   pop
-pop-serial==1.1.0
-    # via
-    #   idem
-    #   pop-evbus
+    #   pop-aiohttp
 pop==21.0.1
     # via
     #   -r requirements/base.txt
     #   acct
-    #   idem
-    #   idem-aiohttp
+    #   pop-aiohttp
     #   pop-config
-    #   pop-evbus
     #   pop-loop
-    #   pop-serial
     #   pytest-pop
     #   rend
 proxy-tools==0.1.0
@@ -157,28 +134,20 @@ pyyaml==6.0
     # via
     #   acct
     #   dict-toolbox
-    #   idem
     #   pop
     #   rend
 rend==6.4.0
     # via
     #   acct
-    #   idem
-    #   idem-aiohttp
     #   pop-config
-    #   pop-evbus
 sniffio==1.2.0
     # via pop-loop
 soupsieve==2.3.1
     # via beautifulsoup4
 toml==0.10.2
-    # via
-    #   idem
-    #   rend
+    # via rend
 tomli==2.0.1
     # via pytest
-tqdm==4.63.0
-    # via idem
 typing-extensions==4.1.1
     # via
     #   aiohttp
@@ -186,8 +155,6 @@ typing-extensions==4.1.1
     #   importlib-metadata
     #   pytest-asyncio
     #   yarl
-wheel==0.37.1
-    # via idem
 yarl==1.7.2
     # via aiohttp
 zipp==3.7.0
