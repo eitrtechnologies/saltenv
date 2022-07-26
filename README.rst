@@ -75,7 +75,7 @@ Install from source
    cd saltenv
 
    # Setup venv
-   | linux & macos                          | windows *                              |
+   | linux & macos                          | windows                                |
    |:--------------------------------------:|:--------------------------------------:|
    | python3 -m venv .venv --prompt idemenv | python3 -m venv .venv --prompt idemenv |
    | source .venv/bin/activate.             | . .\.venv\Scripts\activate             |
