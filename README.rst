@@ -75,9 +75,11 @@ Install from source
    cd saltenv
 
    # Setup venv
-   python3 -m venv .venv --prompt saltenv
-   source .venv/bin/activate
-   pip install -e .
+   | linux & macos                          | windows *                              |
+   |:--------------------------------------:|:--------------------------------------:|
+   | python3 -m venv .venv --prompt idemenv | python3 -m venv .venv --prompt idemenv |
+   | source .venv/bin/activate.             | . .\.venv\Scripts\activate             |
+   | pip install -e .                       | pip install -e .                       |
 
 Usage
 =====
