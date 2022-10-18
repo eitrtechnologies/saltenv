@@ -4,6 +4,15 @@ This project uses [Semantic Versioning](https://semver.org/) - MAJOR.MINOR.PATCH
 
 # Changelog
 
+Saltenv 0.2.1 (2022-10-18)
+==========================
+
+Fixed
+-----
+
+- Use pop-archive to fix CVE-2007-4559
+
+
 Saltenv 0.2.0 (2022-07-07)
 ==========================
 

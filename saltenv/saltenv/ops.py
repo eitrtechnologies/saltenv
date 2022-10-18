@@ -2,7 +2,6 @@ import mimetypes
 import os
 import re
 import sys
-import tarfile
 import zipfile
 from pathlib import Path
 from types import SimpleNamespace
@@ -135,9 +134,7 @@ async def download_version(hub, version, **kwargs):
                     ".tar.gz"
                 ):
                     print("Processing tarball...")
-                    if tarfile.is_tarfile(outfile):
-                        with tarfile.open(outfile) as tar_source:
-                            tar_source.extractall(versions_dir)
+                    if hub.exec.tar.extractall(outfile, versions_dir):
                         if salt_bin_in.exists():
                             salt_bin_in.rename(salt_bin_out)
                         ret = salt_bin_out.exists()
