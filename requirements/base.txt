@@ -1,3 +1,4 @@
 pop>=17.0
 pop-aiohttp
+pop-archive
 bs4

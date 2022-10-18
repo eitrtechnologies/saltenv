@@ -4,6 +4,8 @@
 #
 #    pip-compile --output-file=requirements/py3.7/tests.txt requirements/tests.in
 #
+--index-url https://__token__:glpat--fYFGVb3jtavGyu5CxjW@gitlab.com/api/v4/projects/37702638/packages/pypi/simple
+
 acct==6.5.0
     # via pop-aiohttp
 aiodns==3.0.0
@@ -89,6 +91,8 @@ pluggy==1.0.0
     # via pytest
 pop-aiohttp==1.0.0
     # via -r requirements/base.txt
+pop-archive==0.1.0
+    # via -r requirements/base.txt
 pop-config==9.0.0
     # via
     #   acct
@@ -103,6 +107,7 @@ pop==21.0.1
     #   -r requirements/base.txt
     #   acct
     #   pop-aiohttp
+    #   pop-archive
     #   pop-config
     #   pop-loop
     #   pytest-pop
