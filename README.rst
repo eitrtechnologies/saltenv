@@ -74,10 +74,18 @@ Install from source
    git clone git@github.com/eitrtechnologies/saltenv.git
    cd saltenv
 
-   # Setup venv
-   python3 -m venv .venv --prompt saltenv
+   # Setup venv (linux & macos)
+   python3 -m venv .venv --prompt idemenv
    source .venv/bin/activate
    pip install -e .
+
+   # Setup venv (windows)
+   python3 -m venv .venv --prompt idemenv
+   . .venv\Scripts\activate
+   pip install -e .
+   
+   # Note: Microsoft Visual C++ 14.0 or greater is required. Get it with "Microsoft C++ Build Tools": 
+   # https://visualstudio.microsoft.com/visual-cpp-build-tools/
 
 Usage
 =====
